@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social_media/ui/screens/loader_screen.dart';
+import 'package:social_media/ui/screens/login_screen.dart';
 
 abstract class Screens {
   static const loader = '/LoaderScreen';
@@ -14,6 +15,10 @@ class MainNavigation {
     Screens.loader: (context) {
       print('Create LoaderScreen');
       return const LoaderScreen();
+    },
+    Screens.login: (context) {
+      print('Create LoginScreen');
+      return const LoginScreen();
     },
   };
 
