@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media/business_logic/auth_bloc.dart';
 import 'package:social_media/business_logic/login_cubit.dart';
+import 'package:social_media/business_logic/main_tabs_bloc.dart';
 import 'package:social_media/configuration/configuration.dart';
 import 'package:social_media/repositories/auth_repository.dart';
 import 'package:social_media/repositories/storage_repository.dart';
@@ -32,6 +33,7 @@ class MyApp extends StatelessWidget {
         providers: [
           BlocProvider<AuthBloc>(create: (context) => AuthBloc(authRepository: context.read<AuthRepository>())),
           BlocProvider<LoginCubit>(create: (context) => LoginCubit(authRepository: context.read<AuthRepository>())),
+          BlocProvider<MainTabsBloc>(create: (context) => MainTabsBloc()),
         ],
         child: MaterialApp(
           theme: AppTheme.light,
