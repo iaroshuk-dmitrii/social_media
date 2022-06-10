@@ -4,9 +4,9 @@ import 'package:social_media/ui/screens/login_screen.dart';
 import 'package:social_media/ui/screens/main_tabs_screen.dart';
 
 abstract class Screens {
-  static const loader = '/LoaderScreen';
-  static const login = '/LoginScreen';
-  static const mainTabs = '/MainTabsScreen';
+  static const loader = 'LoaderScreen';
+  static const login = 'LoginScreen';
+  static const mainTabs = 'MainTabsScreen';
 }
 
 class MainNavigation {

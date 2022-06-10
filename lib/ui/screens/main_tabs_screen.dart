@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media/business_logic/auth_bloc.dart';
-import 'package:social_media/business_logic/login_cubit.dart';
 import 'package:social_media/business_logic/main_tabs_bloc.dart';
 import 'package:social_media/ui/navigation.dart';
+import 'package:social_media/ui/screens/create_post_screen.dart';
+import 'package:social_media/ui/screens/news_feed_screen.dart';
+import 'package:social_media/ui/screens/profile_settings_screen.dart';
 
 class MainTabsScreen extends StatelessWidget {
   const MainTabsScreen({Key? key}) : super(key: key);
@@ -20,16 +22,10 @@ class MainTabsScreen extends StatelessWidget {
       child: Scaffold(
         body: IndexedStack(
           index: currentIndex,
-          children: [
-            Center(child: Text('Лента')),
-            Center(child: Text('Новый пост')),
-            Center(
-                child: Column(
-              children: [
-                Text('Профиль'),
-                TextButton(onPressed: () => context.read<LoginCubit>().signOut(), child: Text('Выйти'))
-              ],
-            )),
+          children: const [
+            NewsFeedScreen(),
+            CreatePostScreen(),
+            ProfileSettingsScreen(),
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
@@ -37,7 +33,7 @@ class MainTabsScreen extends StatelessWidget {
           items: const [
             BottomNavigationBarItem(
               label: 'Лента',
-              icon: Icon(Icons.credit_card),
+              icon: Icon(Icons.image_outlined),
               tooltip: 'Лента',
             ),
             BottomNavigationBarItem(
@@ -47,7 +43,7 @@ class MainTabsScreen extends StatelessWidget {
             ),
             BottomNavigationBarItem(
               label: 'Профиль',
-              icon: Icon(Icons.image_outlined),
+              icon: Icon(Icons.person),
               tooltip: 'Профиль',
             ),
           ],
