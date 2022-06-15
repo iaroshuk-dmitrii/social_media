@@ -5,8 +5,7 @@ import 'package:social_media/business_logic/auth_bloc.dart';
 import 'package:social_media/business_logic/image_picker_bloc.dart';
 import 'package:social_media/business_logic/login_cubit.dart';
 import 'package:social_media/business_logic/main_tabs_bloc.dart';
-import 'package:social_media/business_logic/profile_bloc.dart';
-import 'package:social_media/configuration/configuration.dart';
+import 'package:social_media/business_logic/profile_settings_cubit.dart';
 import 'package:social_media/repositories/auth_repository.dart';
 import 'package:social_media/repositories/storage_repository.dart';
 import 'package:social_media/ui/navigation.dart';
@@ -14,9 +13,7 @@ import 'package:social_media/ui/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: FirebaseOptions.fromMap(Configuration.firebaseConfig),
-  );
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -37,10 +34,11 @@ class MyApp extends StatelessWidget {
           BlocProvider<LoginCubit>(create: (context) => LoginCubit(authRepository: context.read<AuthRepository>())),
           BlocProvider<MainTabsBloc>(create: (context) => MainTabsBloc()),
           BlocProvider<ImagePickerBloc>(create: (context) => ImagePickerBloc()),
-          BlocProvider<ProfileBloc>(
-            create: (context) => ProfileBloc(
-                authRepository: context.read<AuthRepository>(), storageRepository: context.read<StorageRepository>()),
-            // lazy: false,
+          BlocProvider<ProfileSettingsCubit>(
+            create: (context) => ProfileSettingsCubit(
+                authRepository: context.read<AuthRepository>(), storageRepository: context.read<StorageRepository>())
+              ..subscribe(),
+            lazy: false,
           ),
         ],
         child: MaterialApp(

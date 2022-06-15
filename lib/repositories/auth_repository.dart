@@ -44,7 +44,6 @@ class AuthRepository {
     } catch (e) {
       throw AuthException('Ошибка, повторите позже.');
     }
-    return null;
   }
 
   Future<User?> getCurrentUser() async {
@@ -62,6 +61,23 @@ class AuthRepository {
 
   Stream<User?> get user {
     return _firebaseAuth.userChanges();
+  }
+
+  Future<void> changeUsername({required String username}) async {
+    if (_firebaseAuth.currentUser?.displayName == username) return;
+    try {
+      await _firebaseAuth.currentUser?.updateDisplayName(username);
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  Future<void> changePhotoUrl({required String photoURL}) async {
+    try {
+      await _firebaseAuth.currentUser?.updatePhotoURL(photoURL);
+    } catch (e) {
+      throw Exception(e);
+    }
   }
 }
 

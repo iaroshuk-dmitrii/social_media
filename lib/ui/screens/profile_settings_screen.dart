@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media/business_logic/auth_bloc.dart';
 import 'package:social_media/business_logic/image_picker_bloc.dart';
 import 'package:social_media/business_logic/login_cubit.dart';
-import 'package:social_media/business_logic/profile_bloc.dart';
+import 'package:social_media/business_logic/profile_settings_cubit.dart';
 import 'package:social_media/ui/constants.dart';
 
 class ProfileSettingsScreen extends StatelessWidget {
@@ -20,8 +20,10 @@ class ProfileSettingsScreen extends StatelessWidget {
           title: const Center(child: Text('Настройки профиля')),
           actions: [
             IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.exit_to_app),
+              onPressed: () {
+                //TODO
+              },
+              icon: const Icon(Icons.exit_to_app),
             ),
           ],
         ),
@@ -34,47 +36,17 @@ class ProfileSettingsScreen extends StatelessWidget {
               children: [
                 const _CircleAvatar(),
                 const _SaveButton(),
-                BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
-                  if (state is AuthAuthenticatedState) {
-                    String name = state.user?.displayName?.toString() ?? '';
-                    return TextFormField(
-                      initialValue: name,
-                      decoration: InputDecoration(
-                        suffixIcon: TextButton(
-                          child: Text('Сохранить'),
-                          onPressed: () {
-                            //TODO
-                          },
-                        ),
-                        labelText: 'Ваше имя',
-                      ),
-                    );
-                  }
-                  return const SizedBox.shrink();
-                }),
-                BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
-                  if (state is AuthAuthenticatedState) {
-                    String email = state.user?.email.toString() ?? '';
-                    return TextFormField(
-                      initialValue: email,
-                      enabled: false,
-                      decoration: InputDecoration(
-                        suffixIcon: Icon(Icons.lock_outlined),
-                        labelText: 'E-mail',
-                      ),
-                    );
-                  }
-                  return const SizedBox.shrink();
-                }),
-                Expanded(child: SizedBox.shrink()),
+                const _UsernameTextForm(),
+                const _EmailTextForm(),
+                const Expanded(child: SizedBox.shrink()),
                 ElevatedButton(
                   onPressed: () {
                     context.read<LoginCubit>().signOut();
                   },
                   style: whiteButtonStyle,
-                  child: const Center(child: const Text('Выйти')),
+                  child: const Center(child: Text('Выйти')),
                 ),
-                SizedBox(height: 25)
+                const SizedBox(height: 25)
               ],
             ),
           ),
@@ -120,7 +92,7 @@ class _SaveButton extends StatelessWidget {
             'Сохранить',
           ),
           onPressed: () {
-            BlocProvider.of<ProfileBloc>(context).add(UpdatePhotoEvent(state.image));
+            context.read<ProfileSettingsCubit>().updatePhoto(state.image);
           },
         );
       } else {
@@ -153,11 +125,71 @@ class _Avatar extends StatelessWidget {
     }
     //
     return CircleAvatar(
-      backgroundColor: Colors.grey,
+      backgroundColor: Colors.grey[200],
       radius: 40,
       foregroundImage: photo,
       child:
           (photoUrl == null && photoFile == null) ? const Icon(Icons.photo_camera, color: Colors.grey, size: 35) : null,
     );
+  }
+}
+
+class _UsernameTextForm extends StatelessWidget {
+  const _UsernameTextForm({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ProfileSettingsCubit, ProfileSettingsState>(builder: (context, state) {
+      Widget? suffixButton;
+      if (state.editingName == EditingName.isEditing) {
+        suffixButton = TextButton(
+          child: const Text('Сохранить'),
+          onPressed: () {
+            context.read<ProfileSettingsCubit>().saveName();
+          },
+        );
+      }
+      if (state.editingName == EditingName.saved) {
+        suffixButton = TextButton(
+          child: const Text('Изменить'),
+          onPressed: () {
+            context.read<ProfileSettingsCubit>().enableEditName();
+          },
+        );
+      }
+      return TextFormField(
+        initialValue: state.user?.displayName,
+        onChanged: (value) {
+          context.read<ProfileSettingsCubit>().nameChanged(value);
+        },
+        readOnly: (state.editingName == EditingName.saved) ? true : false,
+        decoration: InputDecoration(
+          suffixIcon: suffixButton,
+          labelText: 'Ваше имя',
+        ),
+      );
+    });
+  }
+}
+
+class _EmailTextForm extends StatelessWidget {
+  const _EmailTextForm({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ProfileSettingsCubit, ProfileSettingsState>(builder: (context, state) {
+      return TextFormField(
+        initialValue: state.user?.email,
+        readOnly: true,
+        decoration: const InputDecoration(
+          suffixIcon: Icon(Icons.lock_outlined),
+          labelText: 'E-mail',
+        ),
+      );
+    });
   }
 }
