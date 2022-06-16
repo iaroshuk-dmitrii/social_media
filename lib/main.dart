@@ -5,9 +5,11 @@ import 'package:social_media/business_logic/auth_bloc.dart';
 import 'package:social_media/business_logic/image_picker_bloc.dart';
 import 'package:social_media/business_logic/login_cubit.dart';
 import 'package:social_media/business_logic/main_tabs_bloc.dart';
+import 'package:social_media/business_logic/post_cubit.dart';
 import 'package:social_media/business_logic/profile_settings_cubit.dart';
 import 'package:social_media/repositories/auth_repository.dart';
 import 'package:social_media/repositories/storage_repository.dart';
+import 'package:social_media/repositories/store_repository.dart';
 import 'package:social_media/ui/navigation.dart';
 import 'package:social_media/ui/theme.dart';
 
@@ -27,6 +29,7 @@ class MyApp extends StatelessWidget {
       providers: [
         RepositoryProvider(create: (BuildContext context) => AuthRepository()),
         RepositoryProvider(create: (BuildContext context) => StorageRepository()),
+        RepositoryProvider(create: (BuildContext context) => StoreRepository()),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -40,6 +43,11 @@ class MyApp extends StatelessWidget {
               ..subscribe(),
             lazy: false,
           ),
+          BlocProvider<PostCubit>(
+              create: (context) => PostCubit(
+                  authRepository: context.read<AuthRepository>(),
+                  storeRepository: context.read<StoreRepository>(),
+                  storageRepository: context.read<StorageRepository>())),
         ],
         child: MaterialApp(
           theme: AppTheme.light,

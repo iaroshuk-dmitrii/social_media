@@ -42,7 +42,7 @@ class ProfileSettingsCubit extends Cubit<ProfileSettingsState> {
     print('ProfileSettingsCubit: updatePhoto');
     if (state.user != null) {
       String? photoURL = await _storageRepository.uploadFile(
-        user: state.user!,
+        folderName: 'users/${state.user!}/',
         file: file,
         newFileName: 'avatar.jpg',
       );

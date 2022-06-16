@@ -10,21 +10,28 @@ class StorageRepository {
       : _firebaseStorage = firebaseStorage ?? FirebaseStorage.instance;
 
   Future<String?> uploadFile({
-    required User user,
     required XFile file,
     String? newFileName,
     String? folderName,
   }) async {
-    folderName = (folderName ?? '');
+    folderName = folderName ?? '';
     String fileName = newFileName ?? file.name;
     try {
-      UploadTask uploadTask = _firebaseStorage.ref('$folderName${user.uid}/$fileName').putFile(File(file.path));
+      UploadTask uploadTask = _firebaseStorage.ref('$folderName$fileName').putFile(File(file.path));
       String downloadURL = await (await uploadTask).ref.getDownloadURL();
       return downloadURL;
     } catch (e) {
       print(e.toString());
     }
     return null;
+  }
+
+  Future<void> deleteFile({required String url}) async {
+    try {
+      await _firebaseStorage.refFromURL(url).delete();
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   Future<String> getDownloadURL({
