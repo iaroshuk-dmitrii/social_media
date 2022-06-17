@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:social_media/ui/screens/loader_screen.dart';
 import 'package:social_media/ui/screens/login_screen.dart';
@@ -14,15 +16,15 @@ class MainNavigation {
 
   final routes = <String, Widget Function(BuildContext)>{
     Screens.loader: (context) {
-      print('Create LoaderScreen');
+      log('Create LoaderScreen');
       return const LoaderScreen();
     },
     Screens.login: (context) {
-      print('Create LoginScreen');
+      log('Create LoginScreen');
       return const LoginScreen();
     },
     Screens.mainTabs: (context) {
-      print('Create MainTabsScreen');
+      log('Create MainTabsScreen');
       return const MainTabsScreen();
     },
   };

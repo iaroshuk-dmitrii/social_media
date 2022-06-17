@@ -84,29 +84,36 @@ class _SaveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ImagePickerBloc, ImagePickerState>(builder: (context, state) {
-      if (state is ImagePickerSelectedState) {
-        return TextButton(
-          style: ButtonStyle(padding: MaterialStateProperty.all<EdgeInsetsGeometry>(EdgeInsets.zero)),
-          child: const Text(
-            'Сохранить',
-          ),
-          onPressed: () {
-            context.read<ProfileSettingsCubit>().updatePhoto(state.image);
-          },
-        );
-      } else {
-        return TextButton(
-          style: ButtonStyle(padding: MaterialStateProperty.all<EdgeInsetsGeometry>(EdgeInsets.zero)),
-          child: const Text(
-            'Сменить фото профиля',
-          ),
-          onPressed: () {
-            BlocProvider.of<ImagePickerBloc>(context).add(ImagePickerSelectedEvent());
-          },
-        );
-      }
-    });
+    return BlocListener<ImagePickerBloc, ImagePickerState>(
+      listener: (context, state) {
+        if (state is ImagePickerSelectedState) {
+          context.read<ProfileSettingsCubit>().updatePhoto(state.image);
+        }
+      },
+      child: BlocBuilder<ProfileSettingsCubit, ProfileSettingsState>(builder: (context, state) {
+        if (state.image != null) {
+          return TextButton(
+            style: ButtonStyle(padding: MaterialStateProperty.all<EdgeInsetsGeometry>(EdgeInsets.zero)),
+            child: const Text(
+              'Сохранить',
+            ),
+            onPressed: () {
+              context.read<ProfileSettingsCubit>().savePhoto();
+            },
+          );
+        } else {
+          return TextButton(
+            style: ButtonStyle(padding: MaterialStateProperty.all<EdgeInsetsGeometry>(EdgeInsets.zero)),
+            child: const Text(
+              'Сменить фото профиля',
+            ),
+            onPressed: () {
+              BlocProvider.of<ImagePickerBloc>(context).add(ImagePickerSelectedEvent());
+            },
+          );
+        }
+      }),
+    );
   }
 }
 
@@ -123,13 +130,12 @@ class _Avatar extends StatelessWidget {
     } else if (photoUrl != null) {
       photo = NetworkImage(photoUrl!);
     }
-    //
     return CircleAvatar(
       backgroundColor: Colors.grey[200],
       radius: 40,
       foregroundImage: photo,
-      child:
-          (photoUrl == null && photoFile == null) ? const Icon(Icons.photo_camera, color: Colors.grey, size: 35) : null,
+      child: const Icon(Icons.photo_camera, color: Colors.grey, size: 35),
+      // (photoUrl == null && photoFile == null) ? const Icon(Icons.photo_camera, color: Colors.grey, size: 35) : null,
     );
   }
 }

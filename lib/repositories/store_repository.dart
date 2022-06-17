@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:social_media/models/post_model.dart';
 
@@ -41,7 +43,7 @@ class StoreRepository {
       DocumentReference reference = await _firebaseFirestore.collection('posts').add(post.toMap());
       return reference.id;
     } catch (e) {
-      print(e.toString());
+      log(e.toString());
       throw Exception(e);
     }
   }
@@ -50,7 +52,7 @@ class StoreRepository {
     try {
       await _firebaseFirestore.collection('posts').doc(post.id).delete();
     } catch (e) {
-      print(e.toString());
+      log(e.toString());
       throw Exception(e);
     }
   }

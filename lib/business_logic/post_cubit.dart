@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -31,19 +33,19 @@ class PostCubit extends Cubit<PostState> {
         ));
 
   void textChanged(String value) {
-    print('textChanged $value');
+    log('textChanged $value');
     emit(state.copyWith(text: value));
     _checkStatus();
   }
 
   Future<void> imageChanged({XFile? file}) async {
-    print('imageChanged ');
+    log('imageChanged ');
     emit(state.copyWith(image: file));
     _checkStatus();
   }
 
   void resetState() {
-    print('resetState');
+    log('resetState');
     emit(PostState(
       id: '',
       text: '',
@@ -56,7 +58,7 @@ class PostCubit extends Cubit<PostState> {
   }
 
   Future<void> createPost() async {
-    print('createPost');
+    log('createPost');
     emit(state.copyWith(status: PostStatus.inProgress));
     try {
       User? user = await _authRepository.getCurrentUser();
@@ -65,7 +67,7 @@ class PostCubit extends Cubit<PostState> {
         if (state.image != null) {
           String imageName = '${user.uid}-${uuid.v4()}';
           imageUrl = await _storageRepository.uploadFile(
-                folderName: 'posts/',
+                folderName: 'posts',
                 file: state.image!,
                 newFileName: '$imageName.jpg',
               ) ??
@@ -82,13 +84,13 @@ class PostCubit extends Cubit<PostState> {
         emit(state.copyWith(status: PostStatus.success));
       }
     } catch (e) {
-      print(e.toString());
+      log(e.toString());
       emit(state.copyWith(status: PostStatus.error, error: e.toString()));
     }
   }
 
   Future<void> deletePost(Post post) async {
-    print('deletePost');
+    log('deletePost');
     emit(state.copyWith(status: PostStatus.inProgress));
     try {
       if (post.imageUrl != '') {
@@ -97,7 +99,7 @@ class PostCubit extends Cubit<PostState> {
       await _storeRepository.deletePost(post: post);
       emit(state.copyWith(status: PostStatus.success));
     } catch (e) {
-      print(e.toString());
+      log(e.toString());
       emit(state.copyWith(status: PostStatus.error, error: e.toString()));
     }
   }

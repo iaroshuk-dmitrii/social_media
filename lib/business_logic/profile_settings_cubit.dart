@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,14 +24,14 @@ class ProfileSettingsCubit extends Cubit<ProfileSettingsState> {
         ));
 
   void subscribe() {
-    print('ProfileSettingsCubit: subscribe');
+    log('ProfileSettingsCubit: subscribe');
     _userSubscription = _authRepository.user.listen((user) {
       _onUserChanged(user);
     });
   }
 
   void _onUserChanged(User? user) {
-    print('ProfileSettingsCubit: _onProfileChanged');
+    log('ProfileSettingsCubit: _onProfileChanged');
     if (user?.displayName == null || user?.displayName == '') {
       emit(state.copyWith(user: user, editingName: EditingName.empty));
     } else {
@@ -39,31 +40,43 @@ class ProfileSettingsCubit extends Cubit<ProfileSettingsState> {
   }
 
   void updatePhoto(XFile file) async {
-    print('ProfileSettingsCubit: updatePhoto');
-    if (state.user != null) {
+    log('ProfileSettingsCubit: updatePhoto');
+    emit(state.copyWith(image: file));
+  }
+
+  void savePhoto() async {
+    log('ProfileSettingsCubit: savePhoto');
+    XFile? file = state.image;
+    if (state.user != null && file != null) {
       String? photoURL = await _storageRepository.uploadFile(
-        folderName: 'users/${state.user!}/',
+        folderName: 'users/${state.user?.uid}/',
         file: file,
         newFileName: 'avatar.jpg',
       );
       if (photoURL != null) {
         await _authRepository.changePhotoUrl(photoURL: photoURL);
       }
+      emit(ProfileSettingsState(
+        user: state.user,
+        username: state.username,
+        editingName: state.editingName,
+        image: null,
+      ));
     }
   }
 
   void enableEditName() {
-    print('ProfileSettingsCubit: enableEditName');
+    log('ProfileSettingsCubit: enableEditName');
     emit(state.copyWith(editingName: EditingName.isEditing));
   }
 
   void nameChanged(String value) {
-    print('ProfileSettingsCubit: nameChanged');
+    log('ProfileSettingsCubit: nameChanged');
     emit(state.copyWith(username: value, editingName: EditingName.isEditing));
   }
 
   void saveName() async {
-    print('ProfileSettingsCubit: saveName');
+    log('ProfileSettingsCubit: saveName');
     await _authRepository.changeUsername(username: state.username);
     emit(state.copyWith(editingName: EditingName.saved));
   }
@@ -82,22 +95,26 @@ class ProfileSettingsState {
   final User? user;
   final String username;
   EditingName editingName;
+  XFile? image;
 
   ProfileSettingsState({
     this.user,
     required this.username,
     required this.editingName,
+    this.image,
   });
 
   ProfileSettingsState copyWith({
     User? user,
     String? username,
     EditingName? editingName,
+    XFile? image,
   }) {
     return ProfileSettingsState(
       user: user ?? this.user,
       username: username ?? this.username,
       editingName: editingName ?? this.editingName,
+      image: image ?? this.image,
     );
   }
 }
